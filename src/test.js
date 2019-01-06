@@ -12,16 +12,95 @@
       "api":"http://api.rongyiguang.com/easy-smart-web/mallShop"
     }
   }
-   	//const mallId = '5bf50b84130b38000b969e3b'	// online
+   	const mallId = '5bf50b84130b38000b969e3b'	// online
    	 //const mallId = "5330fe6521232ffbd500010b"  //v4
 	 //const mallId = '5330fe6521232ffbd500010b'	// dev
-	const mallId = '5330fe6521232ffbd500010b'	// qa
+	//const mallId = '5330fe6521232ffbd500010b'	// qa
  window.configData =  {
 	"resourceBasePath": "",
-	"RYPostUrl":API_url.qa,
+	"RYPostUrl":API_url.v8,
  	"mallId":mallId,
  	"pageContent": []
  }
+
+const formatMap = {
+	margin:       1,
+	padding:      1,
+	borderRadius: 1,
+	boxShadow:    1,
+	textShadow:   1,
+	transform:    1,
+	border:       1,
+	borderTop:    1,
+	borderRight:  1,
+	borderBottom: 1,
+	borderLeft:   1
+}
+const formatPxMap = {
+	fontSize:          1,
+	width:             1,
+	height:            1,
+	paddingTop:        1,
+	paddingRight:      1,
+	paddingBottom:     1,
+	paddingLeft:       1,
+	top:               1,
+	right:             1,
+	bottom:            1,
+	left:              1,
+	marginTop:         1,
+	marginRight:       1,
+	marginBottom:      1,
+	marginLeft:        1,
+	borderWidth:       1,
+	borderTopWidth:    1,
+	borderRightWidth:  1,
+	borderBottomWidth: 1,
+	borderLeftWidth:   1,
+	lineHeight:        1
+}
+function formatEle(obj) {
+	let { type, data } = obj
+	if (type === 'base') {
+		formatStyle(data)
+		delete obj.auth
+	} else if (type === 'advanced') {
+		data.layout = cssFormatByTerm(data.layout)
+		data.components&&data.components.map(_ => formatEle(_))
+	} else if (type === 'layout') {
+		formatStyle(data)
+		data.componentLayout&&data.componentLayout.map(_ => formatEle(_))
+	}
+}
+function formatStyle(data) {
+	let { style, layout } = data
+	Object.keys(data.style).map(_ => style[_] = cssFormatByTerm(style[_]))
+	data.layout = cssFormatByTerm(layout)
+}
+function cssFormatByTerm(obj) {
+	Object.keys(obj).map(p => {
+		let v = obj[p]
+		if (formatMap[p]) {
+			 Object.keys(v).map(_ => {
+				let w  = v[_]
+				const nowData =  getAttr(w) === 'Number'? (w *2 + 'px'): w
+				obj[p][_] = nowData
+			})
+		}
+		else if (formatPxMap[p]) {
+			obj[p] = v * 2 + 'px'
+		}
+	})
+	var newO = {}
+	var newObj = Object.keys(obj).sort()
+	newObj.map(_ => {
+		newO[_] = obj[_]
+	})
+	return newO
+}
+function formatPage(obj) {
+	obj.elements.map(_ => formatEle(_))
+}
 
 const dataChnage = () => {
 	const originData ={
@@ -2760,6 +2839,7 @@ const dataChnage = () => {
 		    }
 		  }
 		};
+	Object.keys(originData).map(_ => formatPage(originData[_]))
 	let newArr = [];
 	Object.keys(originData).map(item=>{
 		const obj = originData[item];

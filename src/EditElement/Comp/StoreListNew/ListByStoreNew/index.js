@@ -43,7 +43,7 @@ class ListByStoreNew extends React.Component {
 			direction : 'horizontal',
 			speed:1000,
 			freeMode:false,
-			touchRatio : 0.3,//触摸变慢 
+			//touchRatio : 0.3,//触摸变慢 
 			on:{
 				slideNextTransitionStart:function(){
 					ioInput.currentPage += 1;
@@ -112,15 +112,9 @@ function RenderSwiperNew({ props,ioInput, shops,random,toDetails }) {
 
 //动画一
 function RenderDomNew({ props, list,toDetails,opacity,classAni }) {
-	let end = e =>{
-		e.target.style.opacity = 1;
-	}
-	let newArr = aniTime(props,list)
-	let defaultStyle = cssColorFormat(props, 'filter'),
-		animationStyle = {"animationDuration":"0.5s","animationDelay":"0s","animationIterationCount":1};
-	
-	let node = list.length>0 ? newArr.map((_, i) => {
-		if(_.show == 'none') return false
+
+	let defaultStyle = cssColorFormat(props, 'filter');
+	let node = list.length>0 ? list.map((_, i) => {
 		return ( 
 			<div
 				key={i}
@@ -129,9 +123,10 @@ function RenderDomNew({ props, list,toDetails,opacity,classAni }) {
 				onClick={()=>{toDetails(_)}}>
 				<div 
 					className={`ep-item-two ${classAni}`}
-					style={{...animationStyle,opacity:opacity,animationDelay:`${0.1*(_.show)}s`}}
-					onAnimationEnd={e=>{end(e)}}>
-						<Layout itemList={_} data={props.data} styleObj={{}} refresh={true} type={"NewStore"} />
+				>
+						{
+							classAni != 'noRY' ? <Layout itemList={_} data={props.data} styleObj={{}} refresh={true} type={"NewStore"} /> : null
+						}
 				</div>
 			</div> 
 		)
